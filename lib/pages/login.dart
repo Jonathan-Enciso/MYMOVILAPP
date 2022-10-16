@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
     } else if (status == PermissionStatus.denied) {
       Fluttertoast.showToast(
           msg:
-              "MyMóvil necesita acceder a tu cámara para realizar esta operación.",
+              "MyMóvil necesita acceder a tu cámara para realizar esta operación .",
           backgroundColor: c6,
           textColor: c8,
           toastLength: Toast.LENGTH_LONG,
