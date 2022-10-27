@@ -10,7 +10,7 @@ import 'package:mymovilapp/pages/menu/menu.dart';
 import 'package:mymovilapp/session/user.dart';
 import 'package:mymovilapp/widgets/alerts/ErrorProcess.dart';
 
-Future<void> taskConfirm(double latitude, double longitude, String code_vehicle,
+Future<void> taskConfirm(double latitude, double longitude, String codevehicle,
     var size, BuildContext context) async {
   var headers = {
     'Authorization': 'bearer ' + token,
@@ -18,7 +18,7 @@ Future<void> taskConfirm(double latitude, double longitude, String code_vehicle,
   };
 
   final response = await http.get(
-      findEndShift + "employee=" + code + "&vehicle=" + code_vehicle,
+      findEndShift + "employee=" + code + "&vehicle=" + codevehicle,
       headers: headers);
 
   if (response.statusCode == 200) {
@@ -26,7 +26,7 @@ Future<void> taskConfirm(double latitude, double longitude, String code_vehicle,
         eBclosingShiftDetailFromJson(utf8.decode(response.bodyBytes));
     if (eBclosingShiftDetail.data.idTask != null &&
         eBclosingShiftDetail.data.idTask > 0) {
-      closedTask(latitude, longitude, code_vehicle,
+      closedTask(latitude, longitude, codevehicle,
           eBclosingShiftDetail.data.idTask, size, context);
     } else {
       showDialog(
@@ -46,7 +46,7 @@ Future<void> taskConfirm(double latitude, double longitude, String code_vehicle,
   }
 }
 
-Future<void> closedTask(double latitude, double longitude, String code_vehicle,
+Future<void> closedTask(double latitude, double longitude, String codevehicle,
     int task, var size, BuildContext context) async {
   var headers = {
     'Authorization': 'bearer ' + token,
@@ -54,7 +54,7 @@ Future<void> closedTask(double latitude, double longitude, String code_vehicle,
   };
   var body = json.encode({
     "employee": code,
-    "vehicle": code_vehicle,
+    "vehicle": codevehicle,
     "id_task": task,
     "username": code,
     "longitude": longitude.toString(),

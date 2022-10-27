@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -77,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Future<void> _checkpermission_opencamera(var size) async {
+  Future<void> checkpermissionopencamera(var size) async {
     var status = await Permission.camera.status;
 
     if (!status.isGranted) await Permission.camera.request();
@@ -219,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: SizeConfig.screenHeight * 0.6,
                   ),
                   onPressed: () {
-                    _checkpermission_opencamera(SizeConfig.screenWidth);
+                    checkpermissionopencamera(SizeConfig.screenWidth);
                   },
                 ),
                 Padding(

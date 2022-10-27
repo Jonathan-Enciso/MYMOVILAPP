@@ -113,15 +113,15 @@ class _ClosingShiftDetailPageState extends State<ClosingShiftDetailPage> {
   }
 }
 
-void getLocation(var size, String code_vehicle, BuildContext context) async {
+void getLocation(var size, String codevehicle, BuildContext context) async {
   Position position = await Geolocator()
       .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   taskConfirm(
-      position.latitude, position.longitude, code_vehicle, size, context);
+      position.latitude, position.longitude, codevehicle, size, context);
 }
 
 Future<void> requestLocationPermission(
-    var size, String code_vehicle, BuildContext context) async {
+    var size, String codevehicle, BuildContext context) async {
   final status = await Permission.locationWhenInUse.request();
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
@@ -129,7 +129,7 @@ Future<void> requestLocationPermission(
 
   if (geolocationStatus) {
     if (status == PermissionStatus.granted) {
-      getLocation(size, code_vehicle, context);
+      getLocation(size, codevehicle, context);
     } else if (status == PermissionStatus.denied) {
       Fluttertoast.showToast(
           msg: "MyMóvil necesita tu ubicación para gestionar esta operación.",

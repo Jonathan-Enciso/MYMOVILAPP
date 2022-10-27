@@ -128,7 +128,6 @@ class OrientationList extends StatelessWidget {
                                                         ],
                                                       ),
                                                     ));
-                                                ;
                                               }));
                                 }
                               }))
