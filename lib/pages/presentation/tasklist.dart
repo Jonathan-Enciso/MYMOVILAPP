@@ -1,16 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:mymovilapp/data/colors.dart';
 import 'package:mymovilapp/data/size.dart';
-import 'package:mymovilapp/data/urls.dart';
-import 'package:mymovilapp/data/user.dart';
 import 'package:mymovilapp/widgets/CustomShape.dart';
 import 'package:mymovilapp/models/EBtaskOperator.dart';
-import 'package:http/http.dart' as http;
+import 'package:mymovilapp/services/presentation/api_manager.dart';
 import 'dart:async';
-import 'dart:io';
 
 class TasklistPage extends StatefulWidget {
   const TasklistPage({Key key}) : super(key: key);
@@ -232,8 +227,7 @@ class _TasklistPageState extends State<TasklistPage> {
                                                                 .style,
                                                         children: <TextSpan>[
                                                           TextSpan(
-                                                            text:
-                                                                'Hora Inicio: ',
+                                                            text: 'Hora: ',
                                                             style: TextStyle(
                                                                 fontSize: SizeConfig
                                                                         .screenWidth *
@@ -244,74 +238,34 @@ class _TasklistPageState extends State<TasklistPage> {
                                                                         .bold),
                                                           ),
                                                           TextSpan(
-                                                            text: snapshot.data.listData[index].timeOrigin ==
-                                                                        null ||
-                                                                    snapshot
-                                                                            .data
-                                                                            .listData[
-                                                                                index]
-                                                                            .timeOrigin ==
-                                                                        "" ||
-                                                                    snapshot
-                                                                            .data
-                                                                            .listData[
-                                                                                index]
-                                                                            .timeOrigin ==
-                                                                        ''
-                                                                ? ''
-                                                                : snapshot
-                                                                    .data
-                                                                    .listData[
-                                                                        index]
-                                                                    .timeOrigin,
-                                                            style: TextStyle(
-                                                                fontSize: SizeConfig
-                                                                        .screenWidth *
-                                                                    0.035,
-                                                                color: c8),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    RichText(
-                                                      text: TextSpan(
-                                                        style:
-                                                            DefaultTextStyle.of(
-                                                                    context)
-                                                                .style,
-                                                        children: <TextSpan>[
-                                                          TextSpan(
-                                                            text: 'Hora Fin: ',
-                                                            style: TextStyle(
-                                                                fontSize: SizeConfig
-                                                                        .screenWidth *
-                                                                    0.035,
-                                                                color: c8,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          TextSpan(
-                                                            text: snapshot.data.listData[index].timeDestiny ==
-                                                                        null ||
-                                                                    snapshot
-                                                                            .data
-                                                                            .listData[
-                                                                                index]
-                                                                            .timeDestiny ==
-                                                                        "" ||
-                                                                    snapshot
-                                                                            .data
-                                                                            .listData[
-                                                                                index]
-                                                                            .timeDestiny ==
-                                                                        ''
-                                                                ? ''
-                                                                : snapshot
-                                                                    .data
-                                                                    .listData[
-                                                                        index]
-                                                                    .timeDestiny,
+                                                            text: snapshot
+                                                                        .data
+                                                                        .listData[
+                                                                            index]
+                                                                        .startEnd ==
+                                                                    "1"
+                                                                ? snapshot.data.listData[index].timeOrigin == null ||
+                                                                        snapshot.data.listData[index].timeOrigin ==
+                                                                            "" ||
+                                                                        snapshot.data.listData[index].timeOrigin ==
+                                                                            ''
+                                                                    ? ''
+                                                                    : snapshot
+                                                                        .data
+                                                                        .listData[
+                                                                            index]
+                                                                        .timeOrigin
+                                                                : snapshot.data.listData[index].timeDestiny == null ||
+                                                                        snapshot.data.listData[index].timeDestiny ==
+                                                                            "" ||
+                                                                        snapshot.data.listData[index].timeDestiny ==
+                                                                            ''
+                                                                    ? ''
+                                                                    : snapshot
+                                                                        .data
+                                                                        .listData[
+                                                                            index]
+                                                                        .timeDestiny,
                                                             style: TextStyle(
                                                                 fontSize: SizeConfig
                                                                         .screenWidth *
@@ -339,20 +293,5 @@ class _TasklistPageState extends State<TasklistPage> {
         ));
   }
 
-  Future<EBtaskOperator> getTask() async {
-    var obj;
-    try {
-      var headers = {'Authorization': 'bearer ' + token};
-      var response = await http.get(Uri.encodeFull(tasklist + code), headers: headers);
-      if (response.statusCode == 200) {
-        obj = eBtaskOperatorFromJson(utf8.decode(response.bodyBytes));
-      } else {
-        print(response.reasonPhrase);
-      }
-    } catch (Exception) {
-      print(Exception);
-      return obj;
-    }
-    return obj;
-  }
+
 }

@@ -10,8 +10,8 @@ import 'package:mymovilapp/data/colors.dart';
 import 'package:mymovilapp/data/size.dart';
 import 'package:mymovilapp/data/style.dart';
 import 'package:mymovilapp/widgets/CustomShape.dart';
-import 'package:mymovilapp/widgets/alerts/AlertsCode.dart';
-import 'package:mymovilapp/data/user.dart';
+import 'package:mymovilapp/widgets/alerts/ErrorProcess.dart';
+import 'package:mymovilapp/session/user.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -24,7 +24,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   String _scanBarcode = 'Unknown';
-  bool _isLoading = true;
+  bool isLoading = true;
   String usecomuse = '';
 
   String usecompas = '';
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   fin() async {
     await Future.delayed(const Duration(seconds: 4), () {
       setState(() {
-        _isLoading = true;
+        isLoading = true;
       });
     });
   }
@@ -50,16 +50,15 @@ class _LoginPageState extends State<LoginPage> {
     }
     setState(() {
       _scanBarcode = barcodeScanRes;
-
       if (_scanBarcode == '-1') {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return alert;
+            return errorProcessAlert('Código no identificado');
           },
         );
       } else {
-        //  findUser(_scanBarcode, true, 2, 'pass', size, context);
+        findUser(_scanBarcode, true, 3, 'pass', size, context);
       }
     });
   }
@@ -71,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     await Future.delayed(Duration(seconds: 1), () {
       setState(() {
-        _isLoading = false;
+        isLoading = false;
         fin();
         enabled = false;
       });
@@ -229,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: sButton,
                       onPressed: () => {
                         setState(() {
-                          _isLoading = false;
+                          isLoading = false;
                           enabled
                               ? _onnull()
                               : findUser(usecomuse, false, 3, usecompas,

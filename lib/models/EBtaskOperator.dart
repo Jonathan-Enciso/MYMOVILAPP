@@ -23,9 +23,9 @@ class EBtaskOperator {
   dynamic idData;
 
   factory EBtaskOperator.fromJson(Map<String, dynamic> json) => EBtaskOperator(
-        message: json["message"],
-        valid: json["valid"],
-        data: json["data"],
+        message: json["message"] == null ? null : json["message"],
+        valid: json["valid"] == null ? null : json["valid"],
+        data: json["data"] == null ? null : json["data"],
         listData: List<ListDatum>.from(
             json["list_data"].map((x) => ListDatum.fromJson(x))),
         status: json["status"],
@@ -50,6 +50,7 @@ class ListDatum {
     this.codeVehicle,
     this.stopTo,
     this.stopFrom,
+    this.startEnd,
   });
 
   String timeOrigin;
@@ -58,6 +59,7 @@ class ListDatum {
   String codeVehicle;
   String stopTo;
   String stopFrom;
+  String startEnd;
 
   factory ListDatum.fromJson(Map<String, dynamic> json) => ListDatum(
         timeOrigin: json["time_origin"] == null ? null : json["time_origin"],
@@ -66,6 +68,7 @@ class ListDatum {
         codeVehicle: json["code_vehicle"] == null ? null : json["code_vehicle"],
         stopTo: json["stop_to"] == null ? null : json["stop_to"],
         stopFrom: json["stop_from"] == null ? null : json["stop_from"],
+        startEnd: json["start_end"] == null ? null : json["start_end"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -75,5 +78,6 @@ class ListDatum {
         "code_vehicle": codeVehicle == null ? null : codeVehicle,
         "stop_to": stopTo == null ? null : stopTo,
         "stop_from": stopFrom == null ? null : stopFrom,
+        "start_end": startEnd == null ? null : startEnd,
       };
 }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,16 +5,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mymovilapp/data/colors.dart';
-import 'package:mymovilapp/models/EBResponseGeneral.dart';
 import 'package:mymovilapp/data/size.dart';
-import 'package:mymovilapp/data/urls.dart';
-import 'package:mymovilapp/data/user.dart';
+import 'package:mymovilapp/services/presentation/api_manager.dart';
+import 'package:mymovilapp/session/user.dart';
 import 'package:mymovilapp/models/EBfindShiftStart.dart';
 import 'package:mymovilapp/widgets/CustomShape.dart';
-import 'package:mymovilapp/widgets/alerts/SuccessPresentation.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -150,8 +145,12 @@ class _PresentationPageState extends State<PresentationPage> {
                                     Text(
                                       snapshot.data.data.drivingService
                                               .vehicle +
-                                           
-                                         (snapshot.data.data.drivingService.stop == "Centro Logistico ZMOV" ? " - " + snapshot.data.data.busLocation : ""),
+                                          (snapshot.data.data.drivingService
+                                                      .stop ==
+                                                  "Centro Logistico ZMOV"
+                                              ? " - " +
+                                                  snapshot.data.data.busLocation
+                                              : ""),
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize:
@@ -202,26 +201,10 @@ class _PresentationPageState extends State<PresentationPage> {
                         ],
                       ));
                     } else {
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        margin: EdgeInsets.all(15),
-                        elevation: 10,
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(15, 10, 25, 10),
-                              title: Text('¡Hola!'),
-                              subtitle: Text(
-                                  'Comunícate con operaciones, para tener mayor información de tu asignación.'),
-                              leading: Icon(Icons.bus_alert,
-                                  color: Colors.black,
-                                  size: SizeConfig.screenWidth * 0.1),
-                            )
-                          ],
-                        ),
-                      );
+                      return Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          child:
+                              Text('No cuentas con servicios de conducción.'));
                     }
                   } else {
                     if (snapshot.data.data.presentationService != null) {
@@ -328,23 +311,35 @@ class _PresentationPageState extends State<PresentationPage> {
                                           ],
                                         ))),
                               )),
-                          Center(
-                            child: IconButton(
-                              iconSize: 100,
-                              icon: SvgPicture.asset(
-                                'assets/icons/confirmPresentation.svg',
-                              ),
-                              onPressed: () => requestLocationPermission(
-                                  SizeConfig.screenWidth,
-                                  snapshot.data.data.presentationService.idTask,
-                                  code,
-                                  context),
-                            ),
-                          ),
-                          Text(
-                            'Confirmar presentación',
-                            style: TextStyle(color: c1),
-                          ),
+                          snapshot.data.data.presentationService.expired
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  child: Text(
+                                      'Fuera del horario \n de presentación'))
+                              : Column(children: [
+                                  Center(
+                                    child: IconButton(
+                                      iconSize: 100,
+                                      icon: SvgPicture.asset(
+                                        'assets/icons/confirmPresentation.svg',
+                                      ),
+                                      onPressed: () =>
+                                          requestLocationPermission(
+                                              SizeConfig.screenWidth,
+                                              snapshot.data.data
+                                                  .presentationService.idTask,
+                                              code,
+                                              snapshot.data.data
+                                                  .presentationService.idStop,
+                                              context),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Confirmar presentación',
+                                    style: TextStyle(color: c1),
+                                  ),
+                                ]),
                           Padding(
                               padding:
                                   const EdgeInsets.fromLTRB(10, 50, 10, 10),
@@ -354,47 +349,16 @@ class _PresentationPageState extends State<PresentationPage> {
                         ],
                       ));
                     } else {
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        margin: EdgeInsets.all(15),
-                        elevation: 10,
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(15, 10, 25, 10),
-                              title: Text('¡Hola!'),
-                              subtitle: Text(
-                                  'Comunícate con operaciones, para tener mayor información de tu asignación.'),
-                              leading: Icon(Icons.bus_alert,
-                                  color: Colors.black,
-                                  size: SizeConfig.screenWidth * 0.1),
-                            )
-                          ],
-                        ),
-                      );
+                      return Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          child: Text(
+                              'No cuentas con servicios de presentación.'));
                     }
                   }
                 } else {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    margin: EdgeInsets.all(15),
-                    elevation: 10,
-                    child: Column(
-                      children: <Widget>[
-                        ListTile(
-                          contentPadding: EdgeInsets.fromLTRB(15, 10, 25, 10),
-                          title: Text('¡Hola!'),
-                          subtitle: Text(snapshot.data.objVal.wsMes),
-                          leading: Icon(Icons.bus_alert,
-                              color: Colors.black,
-                              size: SizeConfig.screenWidth * 0.1),
-                        )
-                      ],
-                    ),
-                  );
+                  return Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      child: Text(snapshot.data.message));
                 }
               } else {
                 return const Center(
@@ -409,77 +373,16 @@ class _PresentationPageState extends State<PresentationPage> {
   }
 }
 
-Future<EBfindShiftStart> getValue() async {
-  await Future.delayed(Duration(seconds: 1));
-  EBfindShiftStart obj;
-  try {
-    var headers = {'Authorization': 'bearer ' + token};
-
-    http.Response response =
-        await http.get(Uri.encodeFull(findShiftStart + code), headers: headers);
-
-    if (response.statusCode == 200) {
-      obj = eBfindShiftStartFromJson(utf8.decode(response.bodyBytes));
-      print(obj);
-    }
-  } on TimeoutException catch (e) {
-    print('Timeout Error: $e');
-  } on SocketException catch (e) {
-    print('Socket Error: $e');
-  } on Error catch (e) {
-    print('General Error: $e');
-  }
-  return obj;
-}
-
 void getLocation(
-    var size, int taskid, String code, BuildContext context) async {
+    var size, int taskid, String code, int idstop, BuildContext context) async {
   Position position = await Geolocator()
       .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  postSerconConfirm(
-      position.latitude, position.longitude, taskid, code, size, context);
-}
-
-Future<void> postSerconConfirm(double latitude, double longitude, int task,
-    String code, var size, BuildContext context) async {
-  var headers = {
-    'Authorization': 'bearer ' + token,
-    'Content-Type': 'application/json'
-  };
-  var body = json.encode({
-    "longitude": longitude.toString(),
-    "code": code,
-    "latitude": latitude.toString(),
-    "id_task": task
-  });
-
-  final response = await http.post(serconConfirm,
-      headers: headers, body: body, encoding: Encoding.getByName("utf-8"));
-
-  if (response.statusCode == 200) {
-    final ebSerconConfirm =
-        ebResponseGeneralFromJson(utf8.decode(response.bodyBytes));
-    if (ebSerconConfirm.valid) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return alertSuccessPresentation;
-        },
-      );
-      await Future.delayed(const Duration(seconds: 3), () {
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const PresentationPage()));
-      });
-    } else {
-      // dialogo error
-    }
-  } else {
-// dialogo conexion
-  }
+  postSerconConfirm(position.latitude, position.longitude, taskid, code, idstop,
+      size, context);
 }
 
 Future<void> requestLocationPermission(
-    var size, int taskid, String code, BuildContext context) async {
+    var size, int taskid, String code, int idstop, BuildContext context) async {
   final status = await Permission.locationWhenInUse.request();
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
@@ -487,7 +390,7 @@ Future<void> requestLocationPermission(
 
   if (geolocationStatus) {
     if (status == PermissionStatus.granted) {
-      getLocation(size, taskid, code, context);
+      getLocation(size, taskid, code, idstop, context);
     } else if (status == PermissionStatus.denied) {
       Fluttertoast.showToast(
           msg: "MyMóvil necesita tu ubicación para gestionar esta operación.",
