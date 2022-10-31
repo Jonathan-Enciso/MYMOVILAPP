@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:async';
+import 'package:http/http.dart' as http;
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,12 +8,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mymovilapp/data/colors.dart';
-import 'package:mymovilapp/services/closingShift/api_manager.dart';
 import 'package:mymovilapp/data/size.dart';
+import 'package:mymovilapp/data/urls.dart';
+import 'package:mymovilapp/session/user.dart';
 import 'package:mymovilapp/widgets/CustomShape.dart';
-import 'dart:async';
-
 import 'package:permission_handler/permission_handler.dart';
+import 'package:mymovilapp/models/EBResponseGeneral.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:mymovilapp/widgets/alerts/ErrorProcess.dart';
+import 'package:mymovilapp/widgets/alerts/SuccessProcess.dart';
 
 class ClosingShiftDetailPage extends StatefulWidget {
   const ClosingShiftDetailPage({this.code});
@@ -109,19 +115,95 @@ class _ClosingShiftDetailPageState extends State<ClosingShiftDetailPage> {
                 child:
                     SvgPicture.asset('assets/icons/sheetGreen.svg', width: 30))
           ],
-        )));
+        )
+      )
+    );
+  }
+}
+
+Future<void> closedTask(double latitude, double longitude, String code_vehicle, int task, var size, BuildContext context) async {
+  var headers = {
+    'Authorization': 'bearer ' + token,
+    'Content-Type': 'application/json'
+  };
+  var body = json.encode({
+    "employee": code,
+    "vehicle": code_vehicle,
+    "id_task": task,
+    "username": code,
+    "longitude": longitude.toString(),
+    "latitude": latitude.toString()
+  });
+
+  final response = await http.post(closeTask, headers: headers, body: body, encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    EbResponseGeneral ebSerconConfirm = ebResponseGeneralFromJson(utf8.decode(response.bodyBytes));
+    AwesomeDialog(
+      context: context,
+      dialogType: (ebSerconConfirm.valid)? DialogType.SUCCES : DialogType.WARNING,
+      buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+      headerAnimationLoop: false,
+      animType: AnimType.BOTTOMSLIDE,
+      btnOkText: 'Cerrar',
+      showCloseIcon: true,
+      body: Column(
+        children: <Widget>[
+          Text(
+            ebSerconConfirm.message,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    )..show();
+  } else {
+    // dialogo conexion
+  }
+}
+
+Future<void> taskConfirm(double latitude, double longitude, String codevehicle, var size, BuildContext context) async {
+  var headers = {
+    'Authorization': 'bearer ' + token,
+    'Content-Type': 'application/json'
+  };
+
+  http.Response response = await http.get(Uri.encodeFull(findEndShift + "employee=" + code + "&vehicle=" + codevehicle), headers: headers);
+
+  if (response.statusCode == 200) {
+    EbResponseGeneral ebSerconConfirm = ebResponseGeneralFromJson(utf8.decode(response.bodyBytes));
+    if(ebSerconConfirm.valid){
+      closedTask(latitude, longitude, codevehicle, ebSerconConfirm.data.idTask, size, context);
+    }else{
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.WARNING,
+        buttonsBorderRadius: BorderRadius.all(Radius.circular(2)),
+        headerAnimationLoop: false,
+        animType: AnimType.BOTTOMSLIDE,
+        btnOkText: 'Cerrar',
+        showCloseIcon: true,
+        body: Column(
+          children: <Widget>[
+            Text(
+              ebSerconConfirm.message,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      )..show();
+    }
+
+  } else {
+    // dialogo conexion
   }
 }
 
 void getLocation(var size, String codevehicle, BuildContext context) async {
-  Position position = await Geolocator()
-      .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  taskConfirm(
-      position.latitude, position.longitude, codevehicle, size, context);
+  Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  taskConfirm(position.latitude, position.longitude, codevehicle, size, context);
 }
 
-Future<void> requestLocationPermission(
-    var size, String codevehicle, BuildContext context) async {
+Future<void> requestLocationPermission(var size, String codevehicle, BuildContext context) async {
   final status = await Permission.locationWhenInUse.request();
   Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
